@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zip Lips</title>
+  <style>
+
+    .row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #score_board {
+      border: 2px solid black;
+      position: absolute;
+      padding: 1rem;
+      margin: 1rem;
+      font-weight: normal;
+      font-size: 1.4rem;
+      text-align: center;
+    }
+
+    #score_board button {
+      font-size: 1rem;
+      margin: 5px;
+    }
+
+    #score_board .row * {
+      margin: 0px 5px;
+    }
+
+    #taboo_game_display {
+      align-items: center;
+      justify-content: center;
+      width: 80%;
+      margin: auto;
+    }
+    
+    #taboo_card_display {
+      min-width: 40vw;
+      margin: 10px;
+      padding: 20px;
+      border: 1px solid gray;
+      min-height: 10rem;
+      justify-content: space-around;
+    }
+
+    #taboo_game_display button {
+      font-size: 1.5rem;
+      margin: 0.4rem;
+    }
+
+    nav {
+      justify-content: center;
+    }
+
+    nav button {
+      margin: 10px 0;
+    }
+
+    h2 {
+      text-align: center;
+      font-weight: bold;
+      font-size: 3rem;
+    }
+
+    li {
+      font-size: 2rem;
+    }
+
+
+  </style>
+  <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+</head>
+<body>
+  <div id="root">
+    <div id='score_board' class="col">
+      <div class="row">
+        <div class="col">
+          <h3 style="margin: 0px;">Timer</h3>
+          <div id="timer_display">0:00</div>
+        </div>
+        <div class="col">
+          <h3 style="margin: 0px;">Score</h3>
+          <div id="score_display">0</div>
+        </div>
+      </div>
+      <button id="reset_timer_button">reset</button>
+      <button id="start_timer_button">start</button>
+    </div>
+    <div id="taboo_game_display" class="row">
+      <nav class="col">
+        <button id="prev_card_button">PREV</button>
+      </nav>
+      <div id="taboo_card_display"></div>
+      <nav class="col">
+        <button id="score_card_button">NEXT</button>
+        <button id="skip_card_button">SKIP</button>
+      </nav>
+    </div>
+  </div>
+  <script>
+
+    class TabooGame {
+      constructor(root) {
+        this.index = 0;
+        this.cards = [];
+        this.timer = 120;
+        this.score = 0;
+        let children = [...root.getElementsByTagName('div')]
+        this.dom = {
+          root,
+          timer: children.find(v => v.id === "timer_display"),
+          score: children.find(v => v.id === "score_display"),
+          card: children.find(v => v.id === "taboo_card_display")
+        }
+      }
+
+      createNode(str, options = {}) {
+        return Object.assign(document.createElement(str), options);
+      }
+
+      fetchCardData(cb) {
+        let cardIds = this.cards.map(v => v.id);
+        let url = `/api/new-cards${cardIds.length ? `?prevCards=[${cardIds}]` : ''}`;
+        
+        let xhr = new XMLHttpRequest();
+
+        xhr.onload = e => {
+          let data = JSON.parse(e.target.response);
+          this.cards.push(...data);
+        };
+
+        if (cb) xhr.onloadend = cb;
+        xhr.open('GET',url, true);
+        xhr.send();
+      }
+
+      nextCard() {
+        if (this.index++ + 30 > this.cards.length) this.fetchCardData();
+        this.renderCard();
+      }
+
+      scoreCard() {
+        this.nextCard();
+        if (this.isTimerRunning) this.renderScore(++this.score);
+      }
+
+      prevCard() {
+        this.index = (this.index || 1) - 1;
+        this.renderCard();
+      }
+
+      createCardDOM(card) {
+
+        let wrapper = this.createNode('div', {className: 'card_wrapper'});
+        let header = this.createNode('h2', {innerText: card.word});
+        let list = this.createNode('ul');
+        let tabooWords = card.taboos.map(val => list.append(this.createNode('li', {innerText: val})));
+        wrapper.append(header, list);
+        return wrapper;
+
+      }
+
+      renderCard() {
+        let card = this.cards[this.index];
+        this.dom.card.innerHTML = '';
+        this.dom.card.appendChild(this.createCardDOM(card));
+      }
+
+      resetScoreBoard() {
+        this.isTimerRunning = false;
+        this.timer = 120;
+        this.renderTimer();
+        this.score = 0;
+        this.renderScore();
+      }
+
+      renderTimer() {
+        let seconds = this.timer % 60;
+        if (seconds < 10) seconds = '0' + seconds;
+        this.dom.timer.innerText = `${Math.floor(this.timer/60)}:${seconds}`
+          
+      }
+
+      renderScore() {
+        this.dom.score.innerText = this.score;
+      }
+
+      startTimer() {
+        let cb = () => {
+          console.log(this.isTimerRunning, this.timer)
+          if (this.isTimerRunning && this.timer) {
+            this.timer--
+            this.renderTimer();
+            setTimeout(cb, 1000);
+          } else {
+            this.isTimerRunning = false;
+          }
+        }
+        this.isTimerRunning = true;
+
+        cb();
+      }
+
+      load() {
+        this.renderCard();
+        let children = [...this.dom.root.getElementsByTagName('button')];
+        children.find(v => v.id === 'skip_card_button').onclick = () => this.nextCard();
+        children.find(v => v.id === 'score_card_button').onclick = () => this.scoreCard();
+        children.find(v => v.id === 'prev_card_button').onclick = () => this.prevCard();
+        this.dom.root.addEventListener('keydown', (e) => {
+          if (e.keyCode === 37) this.prevCard();
+          else if (e.keyCode === 39) this.nextCard();
+        });
+        children.find(v => v.id === 'reset_timer_button').onclick = () => this.resetScoreBoard();
+        children.find(v => v.id === 'start_timer_button').onclick = () => this.startTimer();
+
+      }
+    }
+    let taboo_game_is_being_developed_duh = true;
+    
+    if (document.getElementById('root')) {
+      if (taboo_game_is_being_developed_duh) {
+        game = new TabooGame(document.getElementById('root'));
+        game.fetchCardData(() => game.load());
+      } else {
+        let game = new TabooGame(document.getElementById('root'));
+        game.fetchCardData(() => game.load());
+      }
+      
+    }
+  </script>
+</body>
+</html>
