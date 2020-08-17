@@ -1,69 +1,107 @@
+body {
+  margin: 0;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.col {
+  flex-direction: column;
+}
+
+.flex {
+  display: flex;
+}
+
+#score_board {
+  flex-direction: row;
+  justify-content: space-between;
+
+  margin: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid gray;
+
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+#score_board h4 {
+  margin: 5px;
+}
 
 
-    .row {
-      display: flex;
-      flex-direction: row;
-    }
+#game_display {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    .col {
-      display: flex;
-      flex-direction: column;
-    }
+#card_display {
+  width: 100%;
+  min-height: 60vh;
+  margin: 0;
+  padding: 0;
 
-    #score_board {
-      border: 2px solid black;
-      position: absolute;
-      padding: 1rem;
-      margin: 1rem;
-      font-weight: normal;
-      font-size: 1.4rem;
-      text-align: center;
-    }
+  justify-content: space-around;
+}
 
-    #score_board button {
-      font-size: 1rem;
-      margin: 5px;
-    }
+#card_display h3 {
+  font-size: 2.5rem;
+  text-align: center;
+}
 
-    #score_board .row * {
-      margin: 0px 5px;
-    }
+#card_display li {
+  line-height: 2rem;
+  font-size: 2rem;
+}
 
-    #taboo_game_display {
-      align-items: center;
-      justify-content: center;
-      width: 80%;
-      margin: auto;
-    }
-    
-    #taboo_card_display {
-      min-width: 40vw;
-      margin: 10px;
-      padding: 20px;
-      border: 1px solid gray;
-      min-height: 10rem;
-      justify-content: space-around;
-    }
+#game_display nav {
+  flex-direction: row;
+  justify-content: space-around;
 
-    #taboo_game_display button {
-      font-size: 1.5rem;
-      margin: 0.4rem;
-    }
+  width: 100%;
+  margin-top: 20px;
+}
 
-    nav {
-      justify-content: center;
-    }
+#game_display nav button {
+  font-size: 1.4rem;
+}
 
-    nav button {
-      margin: 10px 0;
-    }
+.h_line {
+  border: 4px solid red;
+  border-radius: 4px;
+  width: 80%;
+  margin: 20px auto;
+}
 
-    h2 {
-      text-align: center;
-      font-weight: bold;
-      font-size: 3rem;
-    }
+@media only screen and (min-width: 600px) {
+  
+  #score_board {
+    /* border: 2px solid black;
+    position: absolute;
+    font-weight: normal;
+    font-size: 1.4rem; */
+    justify-content: space-around;
+  }
 
-    li {
-      font-size: 2rem;
-    }
+  #game_display {
+    flex-direction: col;
+    width: 80%;
+    margin: auto;
+  }
+
+  #card_display {
+    min-width: 40vw;
+  
+    margin: 10px;
+    padding: 20px;
+
+    border: 1px solid gray;
+  }
+
+  #card_display h2 {
+    font-size: 3rem;
+  }
+
+}
