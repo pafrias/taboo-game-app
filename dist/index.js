@@ -1,12 +1,10 @@
-axios.get('/api/cards')
-.then(res => {
-  console.log(res);
+(() => {
   const data = () => ({
-      index: 0,
-      score: 0,
-      timer_sec: 120,
-      cards: res.data,
-      isTimerRunning: false
+    index: 0,
+    score: 0,
+    timer_sec: 120,
+    cards: [], //[{word: "Welcome!", taboos: ["Have fun!"]}],
+    isTimerRunning: false
   })
 
   const methods = {
@@ -22,16 +20,16 @@ axios.get('/api/cards')
           this.isTimerRunning = false;
         }
       }
-  
+
       this.isTimerRunning = true;
       cb();
     },
 
     fetchCardData() {
-      if (this.index + 50 < this.cards.length) return;
+      if (this.index + 50 < this.cards.length && this.cards.length !== 0) return;
       let cardIds = this.cards.map(v => v.id);
       let url = `/api/cards${cardIds.length ? `?prevCards=[${cardIds}]` : ''}`;
-      axios.get(url).then(res => {
+      return axios.get(url).then(res => {
         this.cards.push(...res.data);
         console.log(this.cards.length);
       });
@@ -47,7 +45,7 @@ axios.get('/api/cards')
       }
     }
   };
-  
+
   const computed = {
     card: function() {
       return this.cards[this.index];
@@ -63,7 +61,10 @@ axios.get('/api/cards')
     el: '#taboo_game_root',
     data,
     computed,
-    methods, 
+    methods,
+    created: async function() {
+      await this.fetchCardData();
+    },
     template: `
     <div>
       <div id="score_board" class="flex">
@@ -79,7 +80,7 @@ axios.get('/api/cards')
       <button @click="start_timer()">START</button>
     </div>
     <div id="game_display" class="flex">
-      <div id="card_display">
+      <div v-if="cards.length" id="card_display">
         <button @click="deleteCard()">delete</button>
         <h3>{{card.word}}</h3>
         <div class="h_line"></div>
@@ -95,4 +96,4 @@ axios.get('/api/cards')
     </div>
   </div>`
   });
-});
+})();
