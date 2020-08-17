@@ -27,6 +27,16 @@ async function readCards(prevArray = []) {
 
 let insertQuery = (word, taboos) => `INSERT INTO Words (word, taboos) values ('${word}', '${taboos}');`;
 
+async function insertCard({word, taboos}) {
+  return client.queryAsync(insertQuery(word, taboos));
+}
+
+let deleteQuery = (ID) => `DELETE FROM Words WHERE id=${ID}`;
+
+async function deleteCard(ID) {
+  return client.queryAsync(deleteQuery(ID));
+}
+
 function ignoreDup(e) {
   let str = e.toString().split(/\n|\t/)[0];
   //console.log(str);
@@ -36,14 +46,10 @@ function ignoreDup(e) {
   }
 }
 
-async function insertCard({word, taboos}) {
-  
-  return client.queryAsync(insertQuery(word, taboos));
-}
-
 module.exports = {
   readCards,
   readCardCount,
   insertCard,
+  deleteCard,
   ignoreDup
 }

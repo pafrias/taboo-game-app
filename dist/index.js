@@ -1,4 +1,4 @@
-axios.get('/api/new-cards')
+axios.get('/api/cards')
 .then(res => {
   console.log(res);
   const data = () => ({
@@ -8,7 +8,6 @@ axios.get('/api/new-cards')
       cards: res.data,
       isTimerRunning: false
   })
-
 
   const methods = {
     reset_timer() {
@@ -25,17 +24,27 @@ axios.get('/api/new-cards')
       }
   
       this.isTimerRunning = true;
-  
       cb();
     },
+
     fetchCardData() {
       if (this.index + 50 < this.cards.length) return;
       let cardIds = this.cards.map(v => v.id);
-      let url = `/api/new-cards${cardIds.length ? `?prevCards=[${cardIds}]` : ''}`;
+      let url = `/api/cards${cardIds.length ? `?prevCards=[${cardIds}]` : ''}`;
       axios.get(url).then(res => {
         this.cards.push(...res.data);
         console.log(this.cards.length);
       });
+    },
+
+    deleteCard() {
+      let {id} = this.cards[this.index];
+      if (prompt('are you sure?', 'no') === 'yes') {
+        axios.delete(`/api/cards/${id}`).then(res => {
+          console.log(res);
+          this.cards= this.cards.filter(v => v.id !== id);
+        });
+      }
     }
   };
   
@@ -49,8 +58,6 @@ axios.get('/api/new-cards')
       return `${min}:${sec < 10 ? '0' + sec : sec}`;
     }
   }
-
-  console.log(data, methods);
 
   new Vue({
     el: '#taboo_game_root',
@@ -73,6 +80,7 @@ axios.get('/api/new-cards')
     </div>
     <div id="game_display" class="flex">
       <div id="card_display">
+        <button @click="deleteCard()">delete</button>
         <h3>{{card.word}}</h3>
         <div class="h_line"></div>
         <ul>
@@ -81,8 +89,8 @@ axios.get('/api/new-cards')
       </div>
       <nav class="flex">
         <button @click="index = (index || 1) - 1">PREV</button>
-        <button @click="index++; fetchCardData()">NEXT</button>
-        <button @click="score++; index++; fetchCardData()">SCORE</button>
+        <button @click="index++; fetchCardData()">SKIP</button>
+        <button @click="score++; index++; fetchCardData()">SCORE!</button>
       </nav>
     </div>
   </div>`
