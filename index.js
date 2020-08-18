@@ -7,7 +7,7 @@ const router = require('./router');
 
 const app = express();
 app.use(morgan('short'));
-app.use(router);
+app.use('/api', router);
 
 const PORT = process.env.TABOO_APP_PORT || 3000;
 

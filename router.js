@@ -4,7 +4,7 @@ const {fetchNewCards} = require('./model/data-scraping');
 
 const router = new express.Router;
 
-router.get('/api/cards', (req, res) => {
+router.get('/cards', (req, res) => {
   const prevCards = req.query.prevCards;
 
   readCards(JSON.parse(prevCards || '[]'))
@@ -14,7 +14,7 @@ router.get('/api/cards', (req, res) => {
       }).catch((e) => res.send(e));
 });
 
-router.delete('/api/cards/:cardID', (req, res) => {
+router.delete('/cards/:cardID', (req, res) => {
   const auth = req.headers.authorization;
   // console.log(auth);
   if (auth && auth === process.env.TABOO_ACCESS_KEY) {
@@ -29,7 +29,7 @@ router.delete('/api/cards/:cardID', (req, res) => {
   }
 });
 
-router.put('/api/cards', (req, res) => {
+router.put('/cards', (req, res) => {
   const auth = req.headers.authorization;
   // console.log(auth);
   if (auth && auth === process.env.TABOO_ACCESS_KEY) {
