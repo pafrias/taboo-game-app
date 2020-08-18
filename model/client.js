@@ -2,8 +2,8 @@ const mysql = require('mysql');
 const Promise = require('bluebird');
 
 const config = {
-  user: 'taboo_access',
-  password: 'taboo_password',
+  user: process.env.MYSQL_USERNAME || 'taboo_access',
+  password: process.env.MYSQL_PW || 'taboo_password',
   database: 'TABOO',
 };
 

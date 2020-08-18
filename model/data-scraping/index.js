@@ -33,32 +33,23 @@ async function fetchAndFormat(N, func) {
   }
 }
 
-client.ping(async function(e) {
-  if (e) process.exit(0);
-  await fetchAndFormat(0, fetch1).catch(() => process.exit(0));
-  await fetchAndFormat(5000, fetch2).catch(() => process.exit(0));
-  await consolidate().catch(() => process.exit(0));
-  process.exit(1);
-});
+/**
+ *
+ * @param {Number} N
+ * @param {Number} M
+ */
+async function fetchNewCards(N, M) {
+  await fetchAndFormat(N, fetch1).catch((e) => e);
+  await fetchAndFormat(M, fetch2).catch((e) => e);
+  await consolidate().catch((e) => e);
+}
 
-
-// Censors and consolidates current rows
-//
 // client.ping(async function(e) {
-//   await consolidate();
-//   const max = await getMax();
-
-//   for (let i = 0; i < max; i++) {
-//     const query = `SELECT * FROM TABOO.Words WHERE id=${i}`;
-//     const [res] = await client.queryAsync(query);
-//     if (res) {
-//       res.taboos = JSON.parse(res.taboos);
-//       if (res && !censor(res)) {
-//         console.log(res);
-//         await deleteCard(res.id).then(() => console.log('----> deleted'));
-//       }
-//     }
-//   }
-//   await consolidate();
-//   process.exit(0);
+//   if (e) process.exit(0);
+//   await fetchNewCards(0, 5000);
+//   process.exit(1);
 // });
+
+module.exports = {
+  fetchNewCards,
+};

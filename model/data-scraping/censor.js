@@ -1,5 +1,5 @@
 /**
- * I have found that in very open API's, there are somethings I just don't want
+ * I have found that in very open API's, there are some things I just don't want
  * in my game of Taboo. Seriously people, come on.
 */
 
@@ -17,7 +17,6 @@ function censor(string = 'asdf') {
     if (string === '') return false;
     if (string.toLowerCase().includes(word)) return false;
   }
-
   return true;
 }
 
