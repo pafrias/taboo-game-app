@@ -3,13 +3,13 @@ const morgan = require('morgan');
 const router = require('./router');
 
 // env expectations:
-// TABOO_ACCESS_KEY, TABOO_APP_PORT, MYSQL_USERNAME, MYSQL_PW
+// TB_ACCESS_KEY, TB_APP_PORT, TB_MYSQL_USERNAME, TB_MYSQL_PW
 
 const app = express();
 app.use(morgan('short'));
 app.use('/api', router);
 
-const PORT = process.env.TABOO_APP_PORT || 3000;
+const PORT = process.env.TB_APP_PORT || 3000;
 
 app.listen(PORT, (e) => {
   if (e) {

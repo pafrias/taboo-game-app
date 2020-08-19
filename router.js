@@ -17,7 +17,7 @@ router.get('/cards', (req, res) => {
 router.delete('/cards/:cardID', (req, res) => {
   const auth = req.headers.authorization;
   // console.log(auth);
-  if (auth && auth === process.env.TABOO_ACCESS_KEY) {
+  if (auth && auth === process.env.TB_ACCESS_KEY) {
     const cardID = req.params.cardID;
     deleteCard(cardID)
         .then((e) => {
